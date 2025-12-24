@@ -8,21 +8,34 @@ bool initZones()
     g_zones.tiny = (t_memHeader *)mmap(NULL, TINYSIZE, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
     g_zones.small = (t_memHeader *)mmap(NULL, SMALLSIZE, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
     
-    if (!g_zones.tiny || !g_zones.small)
+    if (!g_zones.tiny || !g_zones.small)//checking mmap error
         return 0;
 
-    g_zones.tiny->zoneEnd = (char *)g_zones.tiny + TINYSIZE;
-    g_zones.small->zoneEnd = (char *)g_zones.small + SMALLSIZE;
-
+    /////////init first tiny zone///////////////
     g_zones.tiny->userMemory = (char *)g_zones.tiny + sizeof(t_memHeader);// g_zone.tiny + x ajoute x element de taille g_zone.tiny et g_zone + 1 trompe le compilateur qui pense qu'il s'agit d'un tableau
+    g_zones.tiny->zoneEnd = (char *)g_zones.tiny + TINYSIZE;
     g_zones.tiny->size = TINYSIZE - sizeof(t_memHeader);
     g_zones.tiny->isFree = YES;
     g_zones.tiny->next = NULL;
+    g_zones.tiny->prev = NULL;
     
+    /////////init first small zone//////////////
     g_zones.small->userMemory = (char *)g_zones.small + sizeof(t_memHeader);
+    g_zones.small->zoneEnd = (char *)g_zones.small + SMALLSIZE;
     g_zones.small->size = SMALLSIZE - sizeof(t_memHeader);
-    g_zones.small-> isFree = YES;
+    g_zones.small->isFree = YES;
     g_zones.small->next = NULL;
+    g_zones.small->prev = NULL;
+
+    ////////init zones limits list//////////////
+    g_zones.zonesLimits = g_zones.tiny;//convert
+    g_zones.zonesLimits->zoneStart = g_zones.tiny;
+    g_zones.zonesLimits->zoneEnd = g_zones.tiny->zoneEnd;
+    g_zones.zonesLimits->next = g_zones.small;
+    g_zones.zonesLimits->next->zoneStart = g_zones.small;
+    g_zones.zonesLimits->next->zoneEnd = g_zones.tiny->zoneEnd;
+    g_zones.zonesLimits->next->next = NULL;
+
     return 1;
 }
 
@@ -48,9 +61,10 @@ void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t aligned
         printf("parser->size :%ld\n", parser->size);
         if (parser->next == NULL && (char *)parser->zoneEnd - ((char *)parser->userMemory + parser->size) > alignedBlockSize)//si on dépasse une zone/qu'il n'y en a plus
         {   printf("creating new zone\n");
-            parser->next = createNewZone(TINYSIZE);
+            parser->next = createNewZone(TINYSIZE);//ATTENTION get the good size, in arg i think
             if (!parser->next)
                 return NULL;
+            parser->next->prev = parser;
         }
         parser = parser->next;
     }
@@ -62,6 +76,7 @@ void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t aligned
     if (!parser->next)//pas besoins de "couper" la zone valide. On ne coupe que si on veux optimiser
     {//si on est la, on était sur la fin de la chaine
         parser->next = (t_memHeader *)((char *) parser + alignedBlockSize);
+        parser->next->prev = parser;
         parser->next->isFree = YES;
         parser->next->size = (size_t)((char *)parser->next->zoneEnd - (char *)parser->next - sizeof(t_memHeader));
     }

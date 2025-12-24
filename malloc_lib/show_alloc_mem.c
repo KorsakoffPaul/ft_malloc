@@ -15,6 +15,23 @@ void show_alloc_mem()
     }
     parser = g_zones.small;
     userMemStart = (uintptr_t)parser;
-    printf("SMALL : %" PRIXPTR "\n", )
+    printf("SMALL : %" PRIXPTR "\n", userMemStart);
+    while(parser->next)
+    {
+        userMemStart = (uintptr_t)parser->userMemory;
+        userMemEnd = (uintptr_t)parser->userMemory + parser->size;
+        printf("%" PRIXPTR " - %" PRIXPTR " : %ld bytes\n", (unsigned long)userMemStart, (unsigned long)userMemEnd, userMemEnd - userMemStart);
+        parser = parser->next;
+    }
     printf("end !!\n");
+    parser = g_zones.large;
+    userMemStart = (uintptr_t)parser;
+    printf("LARGE : %" PRIXPTR "\n", userMemStart);
+    while(parser)
+    {
+        userMemStart = (uintptr_t)parser->userMemory;
+        userMemEnd = (uintptr_t)parser->userMemory + parser->size;
+        printf("%" PRIXPTR " - %" PRIXPTR " : %ld bytes\n", (unsigned long)userMemStart, (unsigned long)userMemEnd, userMemEnd - userMemStart);
+        parser = parser->next;
+    }
 }

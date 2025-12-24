@@ -21,16 +21,23 @@ typedef struct s_memHeader
     size_t size;
     bool isFree;
     struct s_memHeader *next;
-    char pading[8];
+    struct s_memHeader *prev;
+    // char pading[8];
 }t_memHeader __attribute__((aligned(ALIGNMENT)));
 
+typedef struct s_zonesLimits
+{
+    void *zoneStart;
+    void *zoneEnd;
+    struct s_zonesLimits *next;
+}t_zonesLimits;
 
 typedef struct s_zones
 {
     t_memHeader *tiny;
     t_memHeader *small;
     t_memHeader *large;
-
+    t_zonesLimits *zonesLimits;
 }t_zones;
 
 extern t_zones g_zones;
