@@ -12,7 +12,13 @@
 
 NAME = libft.a
 
-HEADER = libft.h
+SRCDIR      = src
+INCDIR      = includes
+OBJDIR      = obj
+
+CC	= cc
+CFLAGS	= -Wall -Werror -Wextra -I$(INCDIR)
+#HEADER = libft.h
 
 SRC =	ft_isalpha.c	\
 		ft_isalnum.c	\
@@ -49,13 +55,14 @@ SRC =	ft_isalpha.c	\
 		ft_strmapi.c	\
 		ft_putendl_fd.c
 
-OBJ =	$(SRC:.c=.o)
+OBJ	= $(SRC:%.c=$(OBJDIR)/%.o)
+#OBJ =	$(SRC:.c=.o)
 
-CC	= gcc
-CFLAGS	= -Wall -Werror -Wextra
-
-%.o	: %.c $(HEADER)
-	$(CC) -c $(CFLAGS) $< -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+#%.o	: %.c $(HEADER)
+#	$(CC) -c $(CFLAGS) $< -o $@
 
 all	: $(NAME)
 
@@ -63,7 +70,7 @@ $(NAME)	: $(OBJ)
 	ar rc $(NAME) $(OBJ)
 
 clean	:
-	rm -f *.o
+	rm -rf $(OBJDIR)
 
 fclean	: clean
 	rm -f $(NAME)
