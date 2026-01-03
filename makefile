@@ -49,14 +49,25 @@ re: fclean all
 
 # =======================
 # Règle test
-# ======================= utiliserexport LD_PRELOAD=/chemin/vers/libft_malloc.so pour se passer de preload pendant une session bash
+# ======================= 
 TEST_SRC = test.c
 TEST_BIN = test_malloc
 
 test: all $(TEST_BIN)
 	@echo "=== Test LD_PRELOAD ==="
-	@LD_PRELOAD=./$(SYMLINK) ./$(TEST_BIN)
+	@LD_LIBRARY_PATH=. LD_PRELOAD=./$(SYMLINK) ./$(TEST_BIN)
+#library path permet d'ajouter le repertoire courant pour detecter malloc.so
+#preload permet de charger mon malloc avant celui du pc
 
 # Compilation du fichier test.c
 $(TEST_BIN): $(TEST_SRC)
-	$(CC) $(CFLAGS) $(TEST_SRC) -o $(TEST_BIN)
+	$(CC) $(CFLAGS) $(TEST_SRC) \
+		-L. -Wl,--no-as-needed -lft_malloc \
+		-o $(TEST_BIN)
+#no as needed force le compilateur a garder show alloc mem
+#lft_malloc aussi necessaire pour SAM
+#-L permet au linker de trouver la biblio
+
+
+#sinon executer comme ca LD_LIBRARY_PATH=. LD_PRELOAD=./libft_malloc.so ./test_malloc
+#après avoir compilé comme ca cc test.c -L. -Wl,--no-as-needed -lft_malloc -o test_malloc

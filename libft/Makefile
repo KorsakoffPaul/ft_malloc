@@ -53,7 +53,8 @@ SRC =	ft_isalpha.c	\
 		ft_putnbr_fd.c	\
 		ft_split.c		\
 		ft_strmapi.c	\
-		ft_putendl_fd.c
+		ft_putendl_fd.c	\
+		ft_printf.c
 
 OBJ	= $(SRC:%.c=$(OBJDIR)/%.o)
 #OBJ =	$(SRC:.c=.o)

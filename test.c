@@ -2,7 +2,7 @@
 
 int main()
 {
-    // printf("header is %ld bytes size\n", sizeof(t_memHeader));
+    ft_printf("header is %u bytes size\n", sizeof(t_memHeader));
     char *str = malloc(50);
     (void)str;
     str[0] = 'B';
@@ -22,19 +22,19 @@ int main()
     str[14] = '\n';
     str[15] = 0;
 // 
-    printf("test :%s", str);
+    // printf("test :%s", str);
     // for(int i = 0; i < 20; i++)
     // {
     //     char *s = malloc(i);
-    //     (void)s
+    //     (void)s;
     // }
-    show_alloc_mem();
+    // show_alloc_mem();
 // 
 // 
-    printf("----------test free--------------\n\n");
-    free(str);
-    char *nstr = malloc(1);
-    char *nnstr = malloc(1);
+    // printf("----------test free--------------\n\n");
+    // free(str);
+    // char *nstr = malloc(1);
+    // char *nnstr = malloc(1);
 // 
     show_alloc_mem();
 

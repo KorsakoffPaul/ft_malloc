@@ -25,7 +25,7 @@ bool searchInZone(uintptr_t ptr, t_memHeader *parser)
     return 0;
 }
 
-bool inZones(void *ptr)
+bool inZones(void *ptr)//can add arg to search only in apropriate zone with zonelenght
 {
     bool validPtr = NO;
     uintptr_t intptr = (uintptr_t)ptr;
@@ -39,7 +39,23 @@ bool inZones(void *ptr)
     return validPtr;
 }
 
-void free(void *ptr)
+bool canMunmap(t_memHeader *parser)
+{
+    bool everythingFree = YES;
+    void *zoneStart = parser->zoneStart;
+
+    while(parser && everythingFree == YES)
+    {
+        if (parser->zoneStart != zoneStart)
+            break;
+        if(parser->isFree == NO)
+            everythingFree = NO;
+        parser = parser->next;
+    }
+    return everythingFree;
+}
+
+void free(void *ptr)//add ummap when zone empty
 {
     // (void)ptr;
     if(!ptr || !inZones(ptr))
@@ -55,4 +71,6 @@ void free(void *ptr)
         merge(blockToFree, blockToFree->next);
     if(blockToFree->prev && blockToFree->prev->isFree == YES)
         merge(blockToFree->prev, blockToFree);
+    if(canMunmap((t_memHeader *)blockToFree->zoneStart))
+        munmap(blockToFree->zoneStart, blockToFree->zoneLenght);//munmap
 }

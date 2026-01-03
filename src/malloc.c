@@ -16,6 +16,7 @@ bool initZones()
     g_zones.tiny->zoneStart = g_zones.tiny;
     g_zones.tiny->zoneEnd = (char *)g_zones.tiny + TINYSIZE;
     g_zones.tiny->size = TINYSIZE - sizeof(t_memHeader);
+    g_zones.tiny->zoneLenght = TINYSIZE;
     g_zones.tiny->isFree = YES;
     g_zones.tiny->next = NULL;
     g_zones.tiny->prev = NULL;
@@ -25,6 +26,7 @@ bool initZones()
     g_zones.small->zoneStart = g_zones.small;
     g_zones.small->zoneEnd = (char *)g_zones.small + SMALLSIZE;
     g_zones.small->size = SMALLSIZE - sizeof(t_memHeader);
+    g_zones.small->zoneLenght = SMALLSIZE;
     g_zones.small->isFree = YES;
     g_zones.small->next = NULL;
     g_zones.small->prev = NULL;
@@ -32,11 +34,12 @@ bool initZones()
     return 1;
 }
 
-void *createNewZone(int size)//create newZone and fill it, doesn't fill "prev" thought
+void *createNewZone(size_t size)//create newZone and fill it, doesn't fill "prev" thought
 {
-    t_memHeader *newZone = (t_memHeader *)mmap(NULL, TINYSIZE, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
+    t_memHeader *newZone = (t_memHeader *)mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
     if (!newZone)
         return NULL;
+    newZone->zoneLenght = size;
     newZone->isFree = YES;
     newZone->next = NULL;
     newZone->size = size - sizeof(t_memHeader);
@@ -122,14 +125,7 @@ void *largeAlloc(size_t alignedUserSize, size_t alignedBlockSize)
 
 
 void *malloc(size_t size)//alliner size sur la memoire physique (8 ou 16)
-{   
-    // if (size == 0)
-    //     size = 1;
-    // return mmap(NULL, size,
-    //     PROT_READ | PROT_WRITE,
-    //     MAP_PRIVATE | MAP_ANONYMOUS,
-    //     -1, 0);
-    // printf("MY MALLOC\n");
+{
     if (size <= 0)
         return NULL;
     if (g_zones.tiny == 0)//first call
