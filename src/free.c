@@ -3,7 +3,7 @@
 /*assoccie la zone first et second, étant l'ordre dans le memoire physique
 **gère si les deux arguments sont dans la meme zone
 */
-void merge(t_memHeader *firstBlock, t_memHeader *secondBlock)
+void merge(t_memHeader *firstBlock, t_memHeader *secondBlock)//make a merge large
 {
     if (firstBlock->zoneStart != secondBlock->zoneStart)//si de la meme zone
         return;
@@ -16,12 +16,21 @@ void merge(t_memHeader *firstBlock, t_memHeader *secondBlock)
 
 bool searchInZone(uintptr_t ptr, t_memHeader *parser)
 {
+    // ft_printf("in search ?\n");
+    if (!parser)
+    {
+        // ft_printf("parser NULL\n");
+        return 0;
+    }
     while(parser)
     {
+        ft_printf("during cast ?\n");
         if ((uintptr_t)parser->zoneStart <= ptr && (uintptr_t)parser->zoneEnd > ptr)
             return 1;
+        ft_printf("plsno\n");
        parser = parser->next;
     }
+    // ft_printf("no it's not\n");
     return 0;
 }
 
@@ -55,6 +64,32 @@ bool canMunmap(t_memHeader *parser)
     return everythingFree;
 }
 
+void prepareMunmap(t_memHeader *targetZone)
+{
+    t_memHeader *parser = targetZone;
+    t_memHeader *prevZone = targetZone->prev;
+    t_memHeader *nextZone;
+
+    while(parser)
+    {
+        if (parser->zoneStart != targetZone->zoneStart)
+            break;//not sure
+        parser = parser->next;
+    }
+    nextZone = parser;
+
+    if(!prevZone && !nextZone)
+    {
+        if(targetZone->zoneLenght == TINYSIZE)
+            g_zones.tiny = NULL;
+    }
+
+    if(prevZone)
+        prevZone->next = nextZone;
+    if(nextZone)
+        nextZone->prev = prevZone;
+}
+
 void free(void *ptr)//add ummap when zone empty
 {
     // (void)ptr;
@@ -72,5 +107,8 @@ void free(void *ptr)//add ummap when zone empty
     if(blockToFree->prev && blockToFree->prev->isFree == YES)
         merge(blockToFree->prev, blockToFree);
     if(canMunmap((t_memHeader *)blockToFree->zoneStart))
-        munmap(blockToFree->zoneStart, blockToFree->zoneLenght);//munmap
+    {
+        prepareMunmap((t_memHeader *)blockToFree->zoneStart);
+        munmap(blockToFree->zoneStart, blockToFree->zoneLenght);
+    }
 }

@@ -1,41 +1,69 @@
 #include "includes/memory_manager.h"
 
-int main()
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// int main()
+// {
+//     char *s = malloc(4);
+//     free(s);
+//     ft_printf("new malloc\n");
+//     s = malloc(4);
+// }
+
+
+int main(void)
 {
-    ft_printf("header is %u bytes size\n", sizeof(t_memHeader));
-    char *str = malloc(50);
-    (void)str;
-    str[0] = 'B';
-    str[1] = 'o';
-    str[2] = 'n';
-    str[3] = 'j';
-    str[4] = 'o';
-    str[5] = 'u';
-    str[6] = 'r';
-    str[7] = 's';
-    str[8] = ' ';
-    str[9] = '9';
-    str[10] = '1';
-    str[11] = '1';
-    str[12] = '1';
-    str[13] = '\n';
-    str[14] = '\n';
-    str[15] = 0;
-// 
-    // printf("test :%s", str);
-    // for(int i = 0; i < 20; i++)
-    // {
-    //     char *s = malloc(i);
-    //     (void)s;
-    // }
-    // show_alloc_mem();
-// 
-// 
-    // printf("----------test free--------------\n\n");
-    // free(str);
-    // char *nstr = malloc(1);
-    // char *nnstr = malloc(1);
-// 
+    ft_printf("=== realloc basic tests ===\n");
+
+    /* realloc(NULL, size) */
+    char *p = realloc(NULL, 32);
+    if (!p)
+    {
+        ft_printf("FAIL: realloc(NULL, 32)\n");
+        return 1;
+    }
+    strcpy(p, "Hello realloc");
+    ft_printf("OK: realloc(NULL, 32) -> %s\n", p);
+
+    /* grow realloc */
+    char *p2 = realloc(p, 128);
+    if (!p2)
+    {
+        ft_printf("FAIL: realloc grow\n");
+        free(p);
+        return 1;
+    }
+    // ft_printf("OK: realloc grow preserved -> %s\n", p2);
+
+    /* shrink realloc (no split, allowed) */
+    char *p3 = realloc(p2, 8);
+    if (!p3)
+    {
+        ft_printf("FAIL: realloc shrink\n");
+        free(p2);
+        return 1;
+    }
+    // ft_printf("OK: realloc shrink preserved -> %.7s\n", p3);
+
+    /* realloc(ptr, 0) */
+    char *p4 = realloc(p3, 0);
+    if (p4 != NULL)
+        ft_printf("FAIL: realloc(ptr, 0) should return NULL\n");
+    else
+        ft_printf("OK: realloc(ptr, 0)\n");
+
+    /* realloc invalid pointer */
+    int dummy;
+    char *bad = realloc(&dummy, 32);
+    if (bad != NULL)
+        ft_printf("FAIL: realloc on invalid pointer\n");
+    else
+        ft_printf("OK: realloc invalid pointer rejected\n");
+
+    ft_printf("=== test done ===\n");
     show_alloc_mem();
+    return 0;
 
 }

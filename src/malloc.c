@@ -42,6 +42,7 @@ void *createNewZone(size_t size)//create newZone and fill it, doesn't fill "prev
     newZone->zoneLenght = size;
     newZone->isFree = YES;
     newZone->next = NULL;
+    newZone->prev = NULL;
     newZone->size = size - sizeof(t_memHeader);
     newZone->userMemory = (char *)newZone + sizeof(t_memHeader);
     newZone->zoneStart = newZone;
@@ -52,6 +53,16 @@ void *createNewZone(size_t size)//create newZone and fill it, doesn't fill "prev
 
 void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t alignedBlockSize, size_t zoneSize)//ici size = alignedUserSize + alligneHeaderSiez
 {
+    if (!parser)
+    {
+        parser = createNewZone(zoneSize);
+        if (!parser)
+            return NULL;
+        if (zoneSize == TINYSIZE)
+            g_zones.tiny = parser;
+        else
+            g_zones.small = parser;
+    }
     //reach an available freememHeader
     // printf("parser->size :%ld\n", parser->size);
     while(parser->isFree == NO || parser->size < alignedUserSize)//tant que on a pas de block assez grand pour stocker size
@@ -128,17 +139,17 @@ void *malloc(size_t size)//alliner size sur la memoire physique (8 ou 16)
 {
     if (size <= 0)
         return NULL;
-    if (g_zones.tiny == 0)//first call
-    {
-        if (!initZones())
-            return NULL;
-    }
+    // if (g_zones.tiny == 0)//first call
+    // {
+    //     if (!initZones())
+    //         return NULL;
+    // }
     size_t alignedUserSize = (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);//taille utilisateur alligné
     size_t alignedBlockSize = alignedUserSize + sizeof(t_memHeader);//taille utilisateur alligné + header alligné
     if (size <= 256)
         return(tinySmallAlloc(g_zones.tiny, alignedUserSize, alignedBlockSize, TINYSIZE));
     else if (size >= 4096)
-        largeAlloc(alignedUserSize, alignedBlockSize);
+        return(largeAlloc(alignedUserSize, alignedBlockSize));
     else
         return(tinySmallAlloc(g_zones.small, alignedUserSize, alignedBlockSize, SMALLSIZE));
     return NULL;//error

@@ -9,9 +9,10 @@ void *realloc(void *ptr, size_t size)
         free(ptr);
         return NULL;
     }
-    
-    if(!inZones(ptr))//|| inzone(ptr - headerSize)
+    ft_printf("testing inZones\n");
+    if(!inZones(ptr)|| !inZones((char*)ptr - sizeof(t_memHeader)))//|| inzone(ptr - headerSize)
         return NULL;//ptr is either NULL or not in range of my program
+    ft_printf("passed it\n");
     t_memHeader *blockToRealloc = (t_memHeader *)((char *)ptr - sizeof(t_memHeader));
     if(blockToRealloc->userMemory != ptr)//ptr must be headersize after my zones starts
         return NULL;//ptr is not pointing an adress returned by malloc

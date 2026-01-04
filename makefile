@@ -6,7 +6,7 @@ NAME	= libft_malloc_$(HOSTTYPE).so
 SYMLINK	= libft_malloc.so
 
 CC		= cc
-CFLAGS	= -Wall -Wextra -Werror -g -fPIC
+CFLAGS	= -fPIC #-Wall -Wextra -Werror -g 
 LDFLAGS	= -shared
 
 SRCDIR	= src
