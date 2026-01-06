@@ -9,14 +9,11 @@ void *realloc(void *ptr, size_t size)
         free(ptr);
         return NULL;
     }
-    ft_printf("testing inZones\n");
     if(!inZones(ptr)|| !inZones((char*)ptr - sizeof(t_memHeader)))//|| inzone(ptr - headerSize)
         return NULL;//ptr is either NULL or not in range of my program
-    ft_printf("passed it\n");
     t_memHeader *blockToRealloc = (t_memHeader *)((char *)ptr - sizeof(t_memHeader));
-    if(blockToRealloc->userMemory != ptr)//ptr must be headersize after my zones starts
+    if(blockToRealloc->userMemory != ptr)
         return NULL;//ptr is not pointing an adress returned by malloc
-
     if(blockToRealloc->size >= size)//tant qu'on optimise pas la "coupe" coté malloc
         return blockToRealloc->userMemory;
 
@@ -25,7 +22,6 @@ void *realloc(void *ptr, size_t size)
         merge(blockToRealloc, blockToRealloc->next);
         return blockToRealloc->userMemory;
     }
-
     void *newPlace = malloc(size);
     if(!newPlace)
         return NULL;

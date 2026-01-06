@@ -37,7 +37,7 @@ bool initZones()
 void *createNewZone(size_t size)//create newZone and fill it, doesn't fill "prev" thought
 {
     t_memHeader *newZone = (t_memHeader *)mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
-    if (!newZone)
+    if (newZone == MAP_FAILED)
         return NULL;
     newZone->zoneLenght = size;
     newZone->isFree = YES;
@@ -63,8 +63,9 @@ void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t aligned
         else
             g_zones.small = parser;
     }
-    //reach an available freememHeader
-    // printf("parser->size :%ld\n", parser->size);
+
+    // ft_printf("no zone checked\t");
+
     while(parser->isFree == NO || parser->size < alignedUserSize)//tant que on a pas de block assez grand pour stocker size
     {
         // printf("parser->size :%ld\n", parser->size);
@@ -78,6 +79,7 @@ void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t aligned
         parser = parser->next;
     }
     //useable place found
+    // ft_printf("useable place found\t");
     // parser->size = alignedUserSize; //uniquelent si on optimise avec "coupe"
     parser->isFree = NO;
     parser->userMemory = (char *)parser + sizeof(t_memHeader);
@@ -85,10 +87,10 @@ void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t aligned
 
     if (!parser->next)//pas besoins de "couper" la zone valide. On ne coupe que si on veux optimiser
     {//si on est la, on était sur la fin de la chaine
-        size_t memLeft = (size_t)((char *)parser->zoneEnd - (char *)parser->next - sizeof(t_memHeader));
-        
+        // ft_printf("entering end of list\t");
+        size_t memLeft = (size_t)((char *)parser->zoneEnd - (char *)parser - alignedBlockSize - sizeof(t_memHeader));
+        // ft_printf("memLeft :%d\t", memLeft);
         parser->size = alignedUserSize;//a enlever si on "coupe"
-
         if(memLeft < sizeof(t_memHeader))//pas la place d'un header avant fin de zone
         {
             parser->next = createNewZone(zoneSize);
@@ -106,6 +108,7 @@ void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t aligned
         parser->next->prev = parser;
     
     }
+    // ft_printf("alright\n");
     return parser->userMemory;
 }
 
@@ -114,20 +117,23 @@ void *largeAlloc(size_t alignedUserSize, size_t alignedBlockSize)
     t_memHeader *newBlock = mmap(NULL, alignedBlockSize, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
     t_memHeader *largeList = g_zones.large;
     
-    if (!newBlock)
+    if (newBlock == MAP_FAILED)
         return NULL;
 
+    newBlock->zoneStart = (void *)newBlock;
     newBlock->isFree = NO;
     newBlock->next = NULL;
+    newBlock->prev = NULL;
     newBlock->size = alignedUserSize;
     newBlock->userMemory = (char *)newBlock + sizeof(t_memHeader);
-    newBlock->zoneEnd = NULL; //not important
+    newBlock->zoneEnd = (char *)newBlock + alignedBlockSize; //not important
     if (!largeList)
         g_zones.large = newBlock;
     else
     {
         while(largeList->next)
             largeList = largeList->next;
+        newBlock->prev = largeList;
         largeList->next = newBlock;
     }
     return newBlock->userMemory;
