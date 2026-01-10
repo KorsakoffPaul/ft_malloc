@@ -5,7 +5,7 @@
 */
 void merge(t_memHeader *firstBlock, t_memHeader *secondBlock)//make a merge large
 {
-    if (firstBlock->zoneStart != secondBlock->zoneStart)//si de la meme zone
+    if (firstBlock->zoneStart != secondBlock->zoneStart)//if are not in the same zone, do nothing
         return;
     firstBlock->next = secondBlock->next;
     firstBlock->size = firstBlock->size + secondBlock->size + sizeof(t_memHeader);
@@ -19,7 +19,7 @@ bool searchInZone(uintptr_t ptr, t_memHeader *parser)
         return 0;
     while(parser)
     {
-        if ((uintptr_t)parser->zoneStart <= ptr && (uintptr_t)parser->zoneEnd > ptr)//ICICICICICICICI
+        if ((uintptr_t)parser->zoneStart <= ptr && (uintptr_t)parser->zoneEnd > ptr)
             return 1;
        parser = parser->next;
     }
@@ -38,7 +38,7 @@ bool inZones(void *ptr)
     return validPtr;
 }
 
-bool canMunmap(t_memHeader *parser)
+bool 	canMunmap(t_memHeader *parser)
 {
     bool everythingFree = YES;
     void *zoneStart = parser->zoneStart;
@@ -80,7 +80,7 @@ void prepareMunmap(t_memHeader *targetZone)
         nextZone->prev = prevZone;
 }
 
-void free(void *ptr)//add ummap when zone empty
+void free(void *ptr)
 {
     if(!ptr || !inZones(ptr) || !inZones((char*)ptr - sizeof(t_memHeader)))
         return ;//ptr is either NULL or not in range of my program
@@ -97,6 +97,7 @@ void free(void *ptr)//add ummap when zone empty
         merge(blockToFree->prev, blockToFree);
     if(canMunmap((t_memHeader *)blockToFree->zoneStart))
     {
+		ft_printf("munmaping\n");
         prepareMunmap((t_memHeader *)blockToFree->zoneStart);
         munmap(blockToFree->zoneStart, blockToFree->zoneLenght);
     }

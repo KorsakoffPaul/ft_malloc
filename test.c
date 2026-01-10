@@ -15,6 +15,12 @@ int main(void)
 	char *q;
 	free(q);
 	void *testt = malloc(899988);
+	void *test2 = malloc(988888);
+	void *test1 = malloc(98888);
+	show_alloc_mem();
+	free(testt);
+	free(test1);
+	free(test2);
 	show_alloc_mem();
 	if (testt)
 		free(testt);
