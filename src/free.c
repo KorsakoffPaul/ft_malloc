@@ -11,7 +11,6 @@ void merge(t_memHeader *firstBlock, t_memHeader *secondBlock)//make a merge larg
     firstBlock->size = firstBlock->size + secondBlock->size + sizeof(t_memHeader);
     if (secondBlock->next)
         secondBlock->next->prev = firstBlock;
-
 }
 
 bool searchInZone(uintptr_t ptr, t_memHeader *parser)
@@ -24,11 +23,10 @@ bool searchInZone(uintptr_t ptr, t_memHeader *parser)
             return 1;
        parser = parser->next;
     }
-    // ft_printf("no it's not\n");
     return 0;
 }
 
-bool inZones(void *ptr)//can add arg to search only in apropriate zone with zonelenght
+bool inZones(void *ptr)
 {
     bool validPtr = NO;
     uintptr_t intptr = (uintptr_t)ptr;
@@ -84,7 +82,6 @@ void prepareMunmap(t_memHeader *targetZone)
 
 void free(void *ptr)//add ummap when zone empty
 {
-    // (void)ptr;
     if(!ptr || !inZones(ptr) || !inZones((char*)ptr - sizeof(t_memHeader)))
         return ;//ptr is either NULL or not in range of my program
     t_memHeader *blockToFree = (t_memHeader *)((char *)ptr - sizeof(t_memHeader));

@@ -14,6 +14,16 @@ void printZones(t_memHeader *parser)
     }
 }
 
+void printLarge(t_memHeader *parser)
+{
+	while(parser)
+	{
+	    uintptr_t userMemStart = (uintptr_t)parser->userMemory;
+        uintptr_t userMemEnd = (uintptr_t)parser->userMemory + parser->size;
+        ft_printf("%X - %X : %u bytes\n", (unsigned long)userMemStart, (unsigned long)userMemEnd, (unsigned int)userMemEnd - (unsigned int)userMemStart);
+		parser = parser->next;
+	}
+}
 
 void show_alloc_mem()
 {
@@ -34,7 +44,8 @@ void show_alloc_mem()
     userMemStart = (uintptr_t)parser;
     ft_printf("LARGE : %X\n", userMemStart);
     if(parser)
-        printZones(parser);
-    
+	{
+        printLarge(parser);
+	}
     // printf("end !!\n");
 }

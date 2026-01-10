@@ -1,12 +1,12 @@
 ifeq ($(HOSTTYPE),)
-HOSTTYPE := $(shell uname -m)_$(shell uname -s)
+	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
 NAME	= libft_malloc_$(HOSTTYPE).so
 SYMLINK	= libft_malloc.so
 
 CC		= cc
-CFLAGS	= -g -fPIC #-Wall -Wextra -Werror 
+CFLAGS	= -g -fPIC -Wall -Wextra -Werror 
 LDFLAGS	= -shared
 
 SRCDIR	= src
@@ -19,7 +19,7 @@ OBJS	= $(SRCS:%.c=$(OBJDIR)/%.o)
 LIBFT_DIR	= libft
 LIBFT		= $(LIBFT_DIR)/libft.a
 
-all : libft $(NAME) symlink
+all : libft $(NAME) $(SYMLINK)
 
 libft :
 	$(NAME) -C $(LIBFT_DIR)
@@ -34,7 +34,7 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 $(NAME) : $(OBJS) $(LIBFT)
 	$(CC) $(LDFLAGS) $(OBJS) $(LIBFT) -o $(NAME)
 
-symlink :
+$(SYMLINK): $(NAME)
 	ln -sf $(NAME) $(SYMLINK)
 
 clean:
@@ -54,7 +54,7 @@ TEST_SRC = test.c
 TEST_BIN = test_malloc
 
 test: all $(TEST_BIN)
-	@echo "=== Test LD_PRELOAD ==="
+	@echo "=== Test ==="
 	@LD_LIBRARY_PATH=. LD_PRELOAD=./$(SYMLINK) ./$(TEST_BIN)
 #library path permet d'ajouter le repertoire courant pour detecter malloc.so
 #preload permet de charger mon malloc avant celui du pc
