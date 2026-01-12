@@ -68,10 +68,15 @@ void prepareMunmap(t_memHeader *targetZone)
     }
     nextZone = parser;
 
+    
     if(!prevZone && !nextZone)
     {
         if(targetZone->zoneLenght == TINYSIZE)
             g_zones.tiny = NULL;
+        if(targetZone->zoneLenght == SMALLSIZE)
+            g_zones.small = NULL;
+        else
+            g_zones.large = NULL;
     }
 
     if(prevZone)
@@ -97,7 +102,6 @@ void free(void *ptr)
         merge(blockToFree->prev, blockToFree);
     if(canMunmap((t_memHeader *)blockToFree->zoneStart))
     {
-		ft_printf("munmaping\n");
         prepareMunmap((t_memHeader *)blockToFree->zoneStart);
         munmap(blockToFree->zoneStart, blockToFree->zoneLenght);
     }

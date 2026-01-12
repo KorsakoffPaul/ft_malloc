@@ -12,94 +12,94 @@ int main(void)
 {
 	printf("pagesize :%ld\n", sysconf(_SC_PAGESIZE));
 
-	char *q;
-	free(q);
-	void *testt = malloc(899988);
-	void *test2 = malloc(988888);
-	void *test1 = malloc(98888);
-	show_alloc_mem();
-	free(testt);
-	free(test1);
-	free(test2);
-	show_alloc_mem();
-	if (testt)
-		free(testt);
-	else
-		ft_printf("maloc error\n");
-	void *atest = malloc(16);
-	free(atest);
-	free(atest); // doit crasher ou ignorer ?
+	// char *q;
+	// free(q);
+	// void *testt = malloc(899989);
+	// void *test2 = malloc(98888);
+	// void *test1 = malloc(9888);
+	// show_alloc_mem();
+	// free(testt);
+	// free(test1);
+	// free(test2);
+	// show_alloc_mem();
+	// if (testt)
+	// 	free(testt);
+	// else
+	// 	ft_printf("maloc error\n");
+	// void *atest = malloc(16);
+	// free(atest);
+	// free(atest); // doit crasher ou ignorer ?
 
-	void *p1 = malloc(32);
-	void *p2 = malloc(32);
-	memset(p1, 'A', 32);
-	memset(p2, 'B', 32);
+	// void *p1 = malloc(32);
+	// void *p2 = malloc(32);
+	// memset(p1, 'A', 32);
+	// memset(p2, 'B', 32);
 
 
-    // printf("===== TEST GROSSES ALLOCATIONS =====\n");
+    printf("===== TEST GROSSES ALLOCATIONS =====\n");
 
-    // /* 1️⃣ Allocation 1 MB */
-    // printf("\n[1] malloc 1 MB\n");
-    // char *a = malloc(1 * MB);
-    // if (!a)
-    //     return 1;
-    // memset(a, 'A', 1 * MB);
-    // printf("OK\n");
+    /* 1️⃣ Allocation 1 MB */
+    printf("\n[1] malloc 1 MB\n");
+    char *a = malloc(1 * MB);
+    if (!a)
+        return 1;
+    memset(a, 'A', 1 * MB);
+    printf("OK\n");
 
-    // /* 2️⃣ Allocation 10 MB */
-    // printf("\n[2] malloc 10 MB\n");
-    // char *b = malloc(10 * MB);
-    // if (!b)
-    //     return 1;
-    // memset(b, 'B', 10 * MB);
-    // printf("OK\n");
-    // // show_alloc_mem();
-    // /* 3️⃣ realloc plus grand */
-    // printf("\n[3] realloc 1 MB -> 5 MB\n");
-    // a = realloc(a, 5 * MB);
-    // if (!a)
-    //     return 1;
-    // if (a[0] != 'A')
-    //     printf("❌ données corrompues après realloc\n");
-    // memset(a, 'C', 5 * MB);
-    // printf("OK\n");
+    /* 2️⃣ Allocation 10 MB */
+    printf("\n[2] malloc 10 MB\n");
+    char *b = malloc(10 * MB);
+    if (!b)
+        return 1;
+    memset(b, 'B', 10 * MB);
+    printf("OK\n");
+    // show_alloc_mem();
+    /* 3️⃣ realloc plus grand */
+    printf("\n[3] realloc 1 MB -> 5 MB\n");
+    a = realloc(a, 5 * MB);
+    if (!a)
+        return 1;
+    if (a[0] != 'A')
+        printf("❌ données corrompues après realloc\n");
+    memset(a, 'C', 5 * MB);
+    printf("OK\n");
 
-    // /* 4️⃣ realloc plus petit (doit marcher même si tu ignores le shrink) */
-    // printf("\n[4] realloc 10 MB -> 2 MB\n");
-    // b = realloc(b, 2 * MB);
-    // if (!b)
-    //     return 1;
-    // if (b[0] != 'B')
-    //     printf("❌ données corrompues après realloc\n");
-    // printf("OK\n");
+    /* 4️⃣ realloc plus petit (doit marcher même si tu ignores le shrink) */
+    printf("\n[4] realloc 10 MB -> 2 MB\n");
+    b = realloc(b, 2 * MB);
+    if (!b)
+        return 1;
+    if (b[0] != 'B')
+        printf("❌ données corrompues après realloc\n");
+    printf("OK\n");
 
-    // /* 5️⃣ Free partiel */
-    // printf("\n[5] free a (5 MB)\n");
-    // free(a);
-    // printf("OK\n");
+    /* 5️⃣ Free partiel */
+    printf("\n[5] free a (5 MB)\n");
+    free(a);
+    printf("OK\n");
 
-    // /* 6️⃣ Nouvelle grosse alloc après free */
-    // printf("\n[6] malloc 8 MB (test reuse / fragmentation)\n");
-    // char *c = malloc(8 * MB);
-    // if (!c)
-    //     return 1;
-    // memset(c, 'D', 8 * MB);
-    // printf("OK\n");
+    /* 6️⃣ Nouvelle grosse alloc après free */
+    printf("\n[6] malloc 8 MB (test reuse / fragmentation)\n");
+    char *c = malloc(8 * MB);
+    if (!c)
+        return 1;
+    memset(c, 'D', 8 * MB);
+    printf("OK\n");
 
-    // /* 7️⃣ realloc énorme */
-    // printf("\n[7] realloc 8 MB -> 32 MB\n");
-    // c = realloc(c, 32 * MB);
-    // if (!c)
-    //     return 1;
-    // printf("OK\n");
+    /* 7️⃣ realloc énorme */
+    printf("\n[7] realloc 8 MB -> 32 MB\n");
+    c = realloc(c, 32 * MB);
+    if (!c)
+        return 1;
+    printf("OK\n");
 
-    // /* 8️⃣ Nettoyage */
-    // printf("\n[8] free all\n");
-    // free(b);
-    // free(c);
+    /* 8️⃣ Nettoyage */
+    printf("\n[8] free all\n");
+    free(b);
+    free(c);
 
-    // printf("\n===== FIN TEST GROSSES ALLOCATIONS =====\n");
-    // return 0;*/
+    printf("\n===== FIN TEST GROSSES ALLOCATIONS =====\n");
+    // return 0;
 
 
     void *ptrs[N];
@@ -169,14 +169,14 @@ int main(void)
         printf("FAIL realloc invalid ptr\n");
 
     printf("=== reuse freed blocks ===\n");
-    void *a = malloc(64);
-    void *b = malloc(64);
-    free(a);
-    void *c = malloc(64);
-    if (c != a)
+    void *t = malloc(64);
+    void *o = malloc(64);
+    free(t);
+    void *h = malloc(64);
+    if (h != t)
         printf("NOTE: block not reused (not an error)\n");
-    free(b);
-    free(c);
+    free(o);
+    free(h);
 
     printf("=== alternating alloc/free ===\n");
     for (int i = 0; i < 10000; i++)
@@ -186,5 +186,6 @@ int main(void)
     }
 
     printf("=== test finished ===\n");
+    show_alloc_mem();
     return 0;
 }
