@@ -1,4 +1,4 @@
-#include "memory_manager.h"
+#include "malloc.h"
 
 void *realloc(void *ptr, size_t size)
 {
@@ -17,13 +17,11 @@ void *realloc(void *ptr, size_t size)
     if(blockToRealloc->size >= size)//tant qu'on optimise pas la "coupe" coté malloc
         return blockToRealloc->userMemory;
 
-	// ft_printf("doing things\n");
     if (blockToRealloc->next && blockToRealloc->next->isFree && blockToRealloc->size + blockToRealloc->next->size >= size)
     {
         merge(blockToRealloc, blockToRealloc->next);
         return blockToRealloc->userMemory;
     }
-	// ft_printf("after merge\n");
     void *newPlace = malloc(size);
     if(!newPlace)
         return NULL;

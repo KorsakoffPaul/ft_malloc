@@ -1,4 +1,4 @@
-#include "memory_manager.h"
+#include "malloc.h"
 
 /*assoccie la zone first et second, étant l'ordre dans le memoire physique
 **gère si les deux arguments sont dans la meme zone
@@ -95,14 +95,13 @@ void free(void *ptr)
     if (blockToFree->isFree == YES)
         return ;//double free
     blockToFree->isFree = YES;
-
     if(blockToFree->next && blockToFree->next->isFree == YES)
         merge(blockToFree, blockToFree->next);
     if(blockToFree->prev && blockToFree->prev->isFree == YES)
         merge(blockToFree->prev, blockToFree);
-    if(canMunmap((t_memHeader *)blockToFree->zoneStart))
-    {
-        prepareMunmap((t_memHeader *)blockToFree->zoneStart);
-        munmap(blockToFree->zoneStart, blockToFree->zoneLenght);
-    }
+    // if(canMunmap((t_memHeader *)blockToFree->zoneStart))
+    // {
+    //     prepareMunmap((t_memHeader *)blockToFree->zoneStart);
+    //     munmap(blockToFree->zoneStart, blockToFree->zoneLenght);
+    // }
 }
