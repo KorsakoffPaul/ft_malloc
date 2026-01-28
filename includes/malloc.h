@@ -1,5 +1,5 @@
-#ifndef MEMORY_MANAGER_H
-# define MEMORY_MANAGER_H
+#ifndef  MALLOC_H
+# define MALLOC_H
 # include <unistd.h>
 # include <stdio.h>
 # include <sys/mman.h>

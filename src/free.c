@@ -1,4 +1,4 @@
-#include "memory_manager.h"
+#include "malloc.h"
 
 /*assoccie la zone first et second, étant l'ordre dans le memoire physique
 **gère si les deux arguments sont dans la meme zone
@@ -38,21 +38,21 @@ bool inZones(void *ptr)
     return validPtr;
 }
 
-bool 	canMunmap(t_memHeader *parser)
-{
-    bool everythingFree = YES;
-    void *zoneStart = parser->zoneStart;
+// bool 	canMunmap(t_memHeader *parser)
+// {
+//     bool everythingFree = YES;
+//     void *zoneStart = parser->zoneStart;
 
-    while(parser && everythingFree == YES)
-    {
-        if (parser->zoneStart != zoneStart)
-            break;
-        if(parser->isFree == NO)
-            everythingFree = NO;
-        parser = parser->next;
-    }
-    return everythingFree;
-}
+//     while(parser && everythingFree == YES)
+//     {
+//         if (parser->zoneStart != zoneStart)
+//             break;
+//         if(parser->isFree == NO)
+//             everythingFree = NO;
+//         parser = parser->next;
+//     }
+//     return everythingFree;
+// }
 
 void prepareMunmap(t_memHeader *targetZone)
 {
@@ -95,12 +95,11 @@ void free(void *ptr)
     if (blockToFree->isFree == YES)
         return ;//double free
     blockToFree->isFree = YES;
-
     if(blockToFree->next && blockToFree->next->isFree == YES)
         merge(blockToFree, blockToFree->next);
     if(blockToFree->prev && blockToFree->prev->isFree == YES)
         merge(blockToFree->prev, blockToFree);
-    if(canMunmap((t_memHeader *)blockToFree->zoneStart))
+    if(blockToFree->size >= 4096)//if freeing large item
     {
         prepareMunmap((t_memHeader *)blockToFree->zoneStart);
         munmap(blockToFree->zoneStart, blockToFree->zoneLenght);

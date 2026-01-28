@@ -1,4 +1,4 @@
-#include "memory_manager.h"
+#include "malloc.h"
 
 t_zones g_zones = {0};
 
@@ -15,12 +15,12 @@ void *createNewZone(size_t size)//create newZone and fill it, doesn't fill "prev
     newZone->userMemory = (char *)newZone + sizeof(t_memHeader);
     newZone->zoneStart = newZone;
     newZone->zoneEnd = (char *)newZone + size;
-
     return newZone;
 }
 
 void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t alignedBlockSize, size_t zoneSize)//ici size = alignedUserSize + alligneHeaderSiez
 {
+	t_memHeader *prevHeader;
     if (!parser)
     {
         parser = createNewZone(zoneSize);
@@ -31,25 +31,29 @@ void *tinySmallAlloc(t_memHeader *parser, size_t alignedUserSize, size_t aligned
         else
             g_zones.small = parser;
     }
-
-
+	
     while(parser->isFree == NO || parser->size < alignedUserSize)//while no block arge enought to fit usersize
     {
-        if (parser->next == NULL && (char *)parser->zoneEnd - ((char *)parser->userMemory + parser->size) > (long int)alignedBlockSize)//si on dépasse une zone/qu'il n'y en a plus
-        {
-            parser->next = createNewZone(zoneSize);
-            if (!parser->next)
-                return NULL;
-            parser->next->prev = parser;
-        }
+		prevHeader = parser;
         parser = parser->next;
+		if(!parser)
+			break;
     }
+
+	if (!parser)//if no useable block found
+	{
+        prevHeader->next = createNewZone(zoneSize);
+        if (!prevHeader->next)
+            return NULL;
+        prevHeader->next->prev = prevHeader;
+		parser = prevHeader;
+	}
 
     parser->isFree = NO;
     parser->userMemory = (char *)parser + sizeof(t_memHeader);
 
     if (!parser->next)//here we are at the end of list
-    {	
+    {
         int memLeft = (int)((char *)parser->zoneEnd - (char *)parser - alignedBlockSize - sizeof(t_memHeader));
         parser->size = alignedUserSize;
         if(memLeft < (int)sizeof(t_memHeader))//no place for another header before next zone

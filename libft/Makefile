@@ -17,7 +17,7 @@ INCDIR      = includes
 OBJDIR      = obj
 
 CC	= cc
-CFLAGS	= -Wall -Werror -Wextra -I$(INCDIR)
+CFLAGS	= -Wall -fPIC -Werror -Wextra -I$(INCDIR)
 #HEADER = libft.h
 
 SRC =	ft_isalpha.c	\
